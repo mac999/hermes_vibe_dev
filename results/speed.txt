@@ -1,0 +1,7 @@
+model                                     prompt  pp tok/s  tg tok/s  spark pp  spark tg
+qwen3.8-27b-64k                            10158       554      75.2       249      11.5
+qwen3.8-27b-q8-64k                         10158      1139      72.1       513      11.0
+qwen3.6-35b-a3b-64k                        10158      4791     151.2      2156      23.0
+laguna-xs-2.1-64k                          10186      5358     178.8      2411      27.2
+qwen3-coder-next-64k                        9734      4285     103.3      1928      15.7
+qwen3.5-122b-a10b-64k                      10158      2592      63.6      1167       9.7

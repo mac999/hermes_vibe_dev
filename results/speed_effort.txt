@@ -1,0 +1,8 @@
+label                          t1     t2     t3     t4     t5     t6     t7     t8     t9  solved   rate  lint  tests    min
+----------------------------------------------------------------------------------------------------------------------------
+e_high                      13/13  12/12  11/11   9/9   23/23   6/6   11/11   9/9   25/25    9/9   100%     1    9/9   89.5
+e_medium                    13/13  12/12  11/11   9/9   23/23   6/6   11/11   9/9   25/25    9/9   100%     4    9/9   83.2
+e_medium_batch              13/13  12/12  11/11   9/9   23/23   6/6   11/11   9/9   25/25    9/9   100%     1    9/9   79.5
+
+solved = tasks with every hidden test passing; rate = mean hidden pass rate over all tasks;
+tests = runs where the agent executed tests itself; * = agent log references hidden-test paths

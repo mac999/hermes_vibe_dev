@@ -1,0 +1,10 @@
+label                          t1     t2     t3     t4     t5     t6     t7     t8     t9  solved   rate  lint  tests    min
+----------------------------------------------------------------------------------------------------------------------------
+e_high                      13/13  12/12  11/11   9/9   23/23   6/6   11/11   9/9   25/25    9/9   100%     1    9/9   89.5
+v_nvfp4_mtp                 13/13  12/12  11/11   9/9   23/23   6/6   11/11   9/9   25/25    9/9   100%     1    9/9   58.5
+v_nvfp4_dspark              13/13  12/12  11/11   9/9   23/23   6/6   11/11   9/9   25/25    9/9   100%     2    9/9   48.0
+v_laguna_dflash             13/13  11/12  11/11   9/9   22/23   2/6   11/11   9/9   21/25    5/9    89%    19    9/9   35.5
+h8_v2_laguna                13/13  11/12  10/11   9/9   23/23   6/6   11/11   9/9   25/25    7/9    98%     8    9/9   58.3
+
+solved = tasks with every hidden test passing; rate = mean hidden pass rate over all tasks;
+tests = runs where the agent executed tests itself; * = agent log references hidden-test paths

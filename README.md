@@ -172,6 +172,8 @@ On an iPhone over the local network:
 |---|---|---|
 | ![iphone warp](images/stellar-iphone-warp.png) | ![iphone cruise](images/stellar-iphone-cruise.png) | ![iphone arrive](images/stellar-iphone-arrive.png) |
 
+The full source is in [`coding_example/stellar_drift`](coding_example/stellar_drift), with install and run steps.
+
 There is still room for polish, and the local model's weakness is visible here. On a narrow phone screen the title runs under the SOUND button, and the WARPING banner stays on screen after arrival. Sending such a screenshot back to the bot with "fix these" usually works now that the model reads images natively.
 
 ## Repository layout
@@ -182,6 +184,7 @@ bench/            9 coding tasks with hidden tests, runner, scorer, speed tools 
                   task prompts are in Korean, as used for the measurements
 results/          benchmark summaries from the reference machine
 images/           screenshots used above
+coding_example/   Stellar Drift, the game Hermes built over Telegram, ready to run
 ```
 
 ## Tips

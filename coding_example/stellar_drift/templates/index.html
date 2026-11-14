@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#04050c">
+<title>Stellar Drift — Excellent Systems Travel Simulator</title>
+<link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+<canvas id="space"></canvas>
+
+<!-- Mobile touch controls -->
+<div id="touchUI">
+  <div id="joybase"><div id="joyknob"></div></div>
+  <div id="touchBtns">
+    <button id="thrUp" type="button">THR&nbsp;+</button>
+    <button id="thrDn" type="button">THR&nbsp;&minus;</button>
+    <button id="warpBtn" type="button">WARP</button>
+  </div>
+</div>
+
+<div id="hud">
+  <div id="brand">
+    <h1>STELLAR DRIFT</h1>
+    <p>EXCELLENT SYSTEMS &middot; TRAVEL SIMULATOR</p>
+  </div>
+
+  <div id="hudBtns">
+    <button id="soundBtn" title="Toggle Sound">SOUND: OFF</button>
+    <button id="hudBtn" title="Toggle HUD brightness">HUD: BRIGHT</button>
+  </div>
+
+  <div id="status">
+    <div class="row"><span class="lbl">VELOCITY</span><span id="speedVal">0000 u/s</span></div>
+    <div class="bar"><div id="thrFill"></div></div>
+    <div class="row"><span class="lbl">NEAREST</span><span id="targetName">&mdash;</span></div>
+    <div id="targetInfo"></div>
+  </div>
+
+  <div id="controls">
+    <h2>CONTROLS</h2>
+    <ul id="deskControls">
+      <li><b>W / S</b>&nbsp; throttle up / down</li>
+      <li><b>A / D</b>&nbsp; turn left / right</li>
+      <li><b>&uarr; / &darr;</b>&nbsp; pitch up / down</li>
+      <li><b>Mouse drag</b>&nbsp; look around</li>
+      <li><b>T</b>&nbsp; warp to nearest star</li>
+      <li><b>1 &ndash; 8</b>&nbsp; jump to star</li>
+      <li><b>Wheel / + &minus;</b>&nbsp; zoom</li>
+      <li><b>H</b>&nbsp; toggle this panel</li>
+    </ul>
+    <ul id="touchControls">
+      <li><b>Left zone</b>&nbsp; virtual joystick (turn / pitch)</li>
+      <li><b>Right zone</b>&nbsp; drag to look</li>
+      <li><b>Pinch</b>&nbsp; zoom</li>
+      <li><b>THR + / &minus;</b>&nbsp; hold to throttle</li>
+      <li><b>WARP</b>&nbsp; jump to nearest star</li>
+    </ul>
+    <p class="muted">Calm ship ambience awakens when Sound is enabled.</p>
+  </div>
+
+  <div id="toast"></div>
+</div>
+
+<script src="static/js/spacecore.js"></script>
+<script src="static/js/scene.js"></script>
+<script src="static/js/audio.js"></script>
+<script src="static/js/app.js"></script>
+</body>
+</html>

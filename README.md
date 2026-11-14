@@ -2,7 +2,7 @@
 
 Local, on-prem vibe coding with [Hermes Agent](https://hermes-agent.nousresearch.com/) and an open-weight model on your own NVIDIA GPU. You can code from a terminal like Claude Code, or from Telegram with text, photos and voice. Your code and conversations stay on the machine.
 
-The whole setup is one file: [`HERMES_SETUP.md`](HERMES_SETUP.md). Hand it to Claude Code or Codex on a new machine and the agent builds the environment from scratch. The file also picks vLLM settings to match the machine's memory (64 GB, 96 GB GPU, or 128 GB unified memory like DGX Spark).
+The whole setup is one file: [`HERMES_SETUP.md`](HERMES_SETUP.md). A Korean walkthrough is on the [blog](https://daddynkidsmakers.blogspot.com/2026/11/blog-post.html). Hand it to Claude Code or Codex on a new machine and the agent builds the environment from scratch. The file also picks vLLM settings to match the machine's memory (64 GB, 96 GB GPU, or 128 GB unified memory like DGX Spark).
 
 ## What you get
 
@@ -98,6 +98,8 @@ bash ~/hermes-coder-kit/telegram/setup-telegram.sh
 The script reads the token hidden, checks it with Telegram, and stores it with mode 600.
 
 You can also follow `HERMES_SETUP.md` by hand. Every step has the command and the expected output.
+
+A step-by-step walkthrough in Korean, covering hardware, prerequisites, installation and tuning, is on the blog: [헤르메스 기반 바이브 코딩 환경 설치 및 최적화 방법](https://daddynkidsmakers.blogspot.com/2026/11/blog-post.html).
 
 ## Memory tiers
 

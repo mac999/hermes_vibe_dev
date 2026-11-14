@@ -51,6 +51,20 @@ Inference speed on one RTX PRO 6000 Blackwell (96 GB), 10K-token prompt:
 
 Prefill matters most for an agent because Hermes resends the whole conversation on every tool call.
 
+## Why use it anyway
+
+It is slower than Claude Code or Codex. It is still worth running.
+
+- **Your code never leaves the machine.** Source code, logs, customer data, screenshots and voice notes are handled on your own GPU. For defense, finance, healthcare, public-sector or any NDA-bound work, this is often the difference between having an AI coding agent and having none.
+- **It works air-gapped.** After the one-time model download, everything runs without the internet, apart from relaying Telegram messages. Copy the models and this repo into a closed network and set it up there.
+- **No usage meter.** There are no per-token charges, rate limits or weekly caps. Leave it running overnight on long tasks, run many experiments, or let a whole team share one GPU server. The cost is the hardware and electricity you already pay for.
+- **Same answers on the measured tasks.** On the 9-task benchmark it solved everything Claude Code solved. The gap is speed, not correctness, and speed improves with hardware and better draft models.
+- **You control the stack.** The model version is pinned, so behavior does not change under you. Prompts, tools, hooks and policies are plain files you can audit and edit. No vendor outage, policy change or price change can stop your work.
+- **Swap in better models as they appear.** Open-weight models have trailed the frontier by roughly 6 to 12 months and keep closing the gap. Replace the model, rerun `bench/`, and keep everything else.
+- **Code from anywhere.** Through Telegram you can send a task by text, photo or voice from your phone and get the result back while you are away from the desk.
+
+Use it where privacy, cost or control matters more than raw speed. For the hardest, largest or most ambiguous work, a frontier cloud agent is still faster.
+
 ## Install with Claude Code or Codex
 
 On the new machine:

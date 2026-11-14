@@ -1,4 +1,4 @@
-# hermes_vibe_dev
+# hermes vibe coding dev setup
 
 Local, on-prem vibe coding with [Hermes Agent](https://hermes-agent.nousresearch.com/) and an open-weight model on your own NVIDIA GPU. You can code from a terminal like Claude Code, or from Telegram with text, photos and voice. Your code and conversations stay on the machine.
 

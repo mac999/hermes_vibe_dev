@@ -21,8 +21,9 @@ Verified on the reference machine on 2026-11-14.
    - changing GPU power limits. This file never changes them
 3. Never take the Telegram bot token through the chat. Tell the human to run `bash ~/hermes-coder-kit/telegram/setup-telegram.sh` in a terminal themselves (in Claude Code they can prefix it with `!`). Never print the token or the contents of `~/.hermes/.env`.
 4. Do not kill processes with `pkill -f`; a pattern can match your own shell. Find the PID and use `kill PID`.
-5. Download installer scripts to a file and read them before running them.
-6. At the end, fill in the checklist in section 10 and report it. Separate what you verified by running it from what you could not verify.
+5. If you are the Telegram bot, never run `hermes gateway restart`, `hermes gateway stop`, or `kill` on the gateway PID. You run inside that process, so the command ends your own turn, and nothing starts the gateway again. Apply the config change and ask the human to restart it from a terminal. This holds even when an approval prompt offers to run it for you.
+6. Download installer scripts to a file and read them before running them.
+7. At the end, fill in the checklist in section 10 and report it. Separate what you verified by running it from what you could not verify.
 
 Ask the human for these values first:
 
@@ -42,7 +43,8 @@ Ask the human for these values first:
     Agent            Hermes Agent v0.21 or later
     coder profile    terminal use: works in the launch folder, tools terminal/file/todo only, memory off,
                      a 7-step engineering procedure (SOUL.md), a test gate hook, a package-install approval hook
-    default profile  the Telegram bot: same as coder, with the working folder fixed to WORKDIR
+    default profile  the Telegram bot: same as coder, with the working folder fixed to WORKDIR,
+                     plus web search and text-to-speech, because it also gets asked questions (9.6)
     Images           the main model reads images natively
     Speech-to-text   faster-whisper large-v3-turbo on the GPU (Korean by default; change stt.language)
     Text-to-speech   MeloTTS on the CPU, offline (Korean voice by default)
@@ -56,7 +58,8 @@ Why these choices
                        qwen3-coder-next 80B-A3B 94%, qwen3.6 35B-A3B 91%; Qwen3.8 100% in three runs)
     vLLM + NVFP4       14x faster prefill than Ollama. Hermes resends the whole conversation on every call
     DSpark draft       ~4x faster code generation with identical output (89.5 min -> 48 min for the 9 tasks)
-    3 tools only       the other tool definitions cost ~14K tokens on every request
+    3 tools only       the other tool definitions cost ~14K tokens on every request. The bot adds web
+                       and tts: a question it cannot search, it guesses at (9.6)
     memory off         old notes pulled the agent into wrong folders and facts
 
 
@@ -758,13 +761,16 @@ bash "$KIT/profile/apply-coder-profile.sh" default "$MODEL" 65536 "$BASE_URL" "$
 [ -d "$BK/memories" ] && cp -a "$BK/memories/." "$H/memories/"
 
 hermes config set terminal.cwd "$WORKDIR"
-for ts in web browser vision image_gen tts memory session_search connections clarify \
+# Coding keeps three tools. The bot also answers questions that need current facts,
+# so it keeps web (search and extract) and tts; without web it scrapes with curl,
+# gets anti-bot pages, and burns its retry budget. See section 9.6.
+for ts in browser vision image_gen memory session_search connections clarify \
           delegation cronjob computer_use code_execution skills; do
   hermes tools disable --platform telegram "$ts" >/dev/null 2>&1 || true
 done
-hermes tools enable --platform telegram terminal file todo >/dev/null
+hermes tools enable --platform telegram terminal file todo tts web >/dev/null
 echo "default profile ready: cwd $WORKDIR, model $MODEL at $BASE_URL"
-echo "restart the gateway: hermes gateway status -> kill <PID> -> scripts/start-stack.sh"
+echo "restart the gateway FROM A TERMINAL, not from the bot: hermes gateway status -> kill <PID> -> scripts/start-stack.sh"
 HERMES_KIT_EOF
 ```
 
@@ -1183,7 +1189,7 @@ It reads the token without echo, checks it with Telegram, and writes it to `~/.h
 
 On the `small` tier: `~/hermes-coder-kit/scripts/apply-telegram-default.sh "$WORKDIR" qwen3.8-27b-64k http://127.0.0.1:11434/v1 ""`.
 
-The script backs up `config.yaml`, `SOUL.md` and `memories` to `~/.hermes/backup-default-<timestamp>`, sets the working folder (running `git init` if needed, because the test gate only runs inside git repositories), limits the Telegram tools to terminal, file and todo, and restores the memory files. Streaming is off by default in Hermes; without it the bot sends nothing until the whole answer is done.
+The script backs up `config.yaml`, `SOUL.md` and `memories` to `~/.hermes/backup-default-<timestamp>`, sets the working folder (running `git init` if needed, because the test gate only runs inside git repositories), limits the Telegram tools to terminal, file, todo, tts and web (9.6), and restores the memory files. Streaming is off by default in Hermes; without it the bot sends nothing until the whole answer is done.
 
 9.3 Gateway:
 
@@ -1229,7 +1235,26 @@ The warm-up line downloads the voice and BERT models once; after that `tts-melo`
 
 Expected: `stream,opus`. About 8 seconds per sentence and 2.5 GB of RAM while speaking. If 9.4 is installed, transcribe `/tmp/tts-out.ogg` with `stt-whisper` and compare.
 
-9.6 Restart the gateway after any config change. Get the PID from `hermes gateway status`, make sure the bot is idle (the last `API call` time in `~/.hermes/logs/agent.log`), `kill PID`, then `~/hermes-coder-kit/scripts/start-stack.sh`.
+9.6 Web search. The bot gets asked questions that need current facts, not only coding tasks. With no search tool it falls back to `curl` against Google or DuckDuckGo, receives an anti-bot or JavaScript page, reads it as an empty result, and retries until the loop guardrail stops it with `identical_cycle_halt`. Give it the `web` toolset and a search backend.
+
+    hermes pm install --extra ddgs
+    hermes tools enable --platform telegram web
+    hermes tools list --platform telegram
+
+`ddgs` is the keyless backend: DuckDuckGo, no API key, no account, nothing leaves the machine except the query itself. `hermes pm install --extra ddgs` records the extra, so `hermes update` keeps it. `apply-telegram-default.sh` already enables the toolset; the `enable` line above is for an installation made before that change.
+
+Expected from `tools list`: `✓ enabled web`, alongside `terminal`, `file`, `todo` and `tts`. Restart the gateway, then ask the bot something it cannot answer from the model alone, such as a release version from this month, and check that the answer cites pages rather than guessing.
+
+Two notes:
+
+- Do not put `stt` in `platform_toolsets`. It is not a toolset with tools behind it, and the config validator rejects it. Inbound voice is transcribed by the gateway from `stt.enabled` (9.4), with no agent tool involved.
+- For better result quality than DuckDuckGo, set `BRAVE_SEARCH_API_KEY`, `TAVILY_API_KEY`, `SERPER_API_KEY` or `EXA_API_KEY` in `~/.hermes/.env`; Hermes prefers a keyed backend over the keyless one. This sends queries to that vendor, so on an air-gapped or NDA-bound machine stay on `ddgs`.
+
+Searching is not the same as judging. Measure the bot's answers the way you would any other source: a query that returns a result count is not evidence that a claim is true.
+
+9.7 Restart the gateway after any config change. Get the PID from `hermes gateway status`, make sure the bot is idle (the last `API call` time in `~/.hermes/logs/agent.log`), `kill PID`, then `~/hermes-coder-kit/scripts/start-stack.sh`.
+
+Run this from a terminal, never from the bot. A restart asked of the bot kills the process the bot is running in: the turn ends mid-answer, nothing starts the gateway again, and Telegram messages sent meanwhile are dropped on the next cold boot. Hermes flags the command, but smart approval can approve it on its own, so the rule has to hold in section 0 rather than at the prompt. `hermes gateway install` creates a user service that comes back by itself; it was not tested on the reference machine.
 
 Telegram usage: send coding requests as text, photos or voice notes. `/voice on` answers voice with voice, `/voice tts` answers everything with voice too, `/voice off` turns it off. `/new` starts a fresh conversation; start each new task with it, because long chats trigger context compression waits.
 
@@ -1247,7 +1272,9 @@ Telegram usage: send coding requests as text, photos or voice notes. `/voice on`
     Telegram connection      "telegram connected" in gateway.log
     speech-to-text           9.4 check
     text-to-speech           9.5 check
+    web search               hermes tools list --platform telegram | grep web
     Telegram in practice     the human sends text, a photo and a voice note
+    Telegram research        ask the bot a question needing a current fact; the answer cites pages
 
 Speed test (reference gpu96: code about 246 tok/s, prose about 118 tok/s; the numbers below include prefill):
 
@@ -1299,6 +1326,14 @@ Prefix `GPU=1` or `MODEL_DIR=...` if they differ. Telegram requests that arrive 
     "Dual-stack api.telegram.org path failed"      the gateway recovers through another route; ignore if "recovered" follows
     hooks do not run                               hermes -p coder hooks doctor; the folder must be a git repo
     the agent stops before installing a package    install-guard is waiting for approval; approve, or preinstall in venv_hm
+    "Tool guardrail halted terminal:               the agent retried one command with no progress. Usually a missing
+    identical_cycle_halt"                          tool, not a bad model: check the tool it kept reaching for (9.6)
+    the bot curls Google and gets nothing          the web toolset is off; section 9.6. Google serves curl an
+                                                  anti-bot page, so a 200 response can still carry no results
+    the bot went silent after a config change      it restarted the gateway it runs in; see 9.7. Start the gateway
+                                                  from a terminal: nothing supervises it unless you installed a service
+    "unknown toolset 'stt'"                        remove stt from platform_toolsets; transcription is stt.enabled (9.4)
+    web_search returns no results                  hermes pm install --extra ddgs, then restart the gateway
 
 Undo: copy the files from `~/.hermes/backup-default-<timestamp>` back to `~/.hermes` and restart the gateway. For the coder profile, `hermes profile delete coder` and redo section 8.
 

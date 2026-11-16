@@ -15,7 +15,7 @@ The whole setup is one file: [`HERMES_SETUP.md`](HERMES_SETUP.md). A Korean walk
 | Speech | faster-whisper large-v3-turbo for speech-to-text; MeloTTS on CPU for text-to-speech; both offline |
 
 The coding tuning:
-- three tools only: terminal, file and todo
+- three tools for coding: terminal, file and todo; the Telegram bot adds web search and text-to-speech, since it also answers questions
 - memory off
 - a 7-step engineering procedure in SOUL.md: explore, plan, test first, implement, verify, review, report
 - a test-gate hook that runs the tests before the agent may finish
